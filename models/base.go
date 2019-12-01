@@ -3,7 +3,7 @@ package models
 import (
 	"fmt"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/joho/godotenv"
 	"os"
 )
@@ -11,7 +11,7 @@ import (
 var db *gorm.DB
 
 func init() {
-	//err := godotenv.Load("mock.env")
+	//err := godotenv.Load(".env")
 	//if err != nil {
 	//	fmt.Println(err)
 	//}
