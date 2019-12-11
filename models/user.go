@@ -67,12 +67,14 @@ func Login(login, password string) map[string]interface{} {
 		return u.Message(false, "Invalid login credentials. Please try again")
 	}
 
-	tk := &Token{UserId: user.ID, ExpirationTime: time.Now().Add(6 * time.Hour).Unix()}
+	tokenExpDate := time.Now().Add(6 * time.Hour)
+	tk := &Token{UserId: user.ID, ExpirationTime: tokenExpDate.Unix()}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
 	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
 
 	resp := u.Message(true, "Logged In")
 	resp["token"] = tokenString
+	resp["tokenExpDate"] = tokenExpDate
 	return resp
 }
 
