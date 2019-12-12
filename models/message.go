@@ -33,7 +33,16 @@ func (message *Message) Validate() (map[string]interface{}, bool) {
 		fmt.Println(err)
 	}
 	if cnt == 0 {
-		return u.Message(false, "Attempt to add nonexistent user"), false
+		return u.Message(false, "Attempt to send message to nonexistent user"), false
+	}
+
+	cnt = 0
+	err = GetDB().Table("users").Where("id = ?", message.SenderId).Count(&cnt).Error
+	if err != nil {
+		fmt.Println(err)
+	}
+	if cnt == 0 {
+		return u.Message(false, "Attempt to send message to nonexistent user"), false
 	}
 
 	return u.Message(true, "Requirement passed"), true
@@ -47,27 +56,35 @@ func (message *Message) Create() map[string]interface{} {
 	return u.Message(true, "Message has been created")
 }
 
-func GetLastMessage(senderId, receiverId uint) *Message {
+func GetLastMessage(senderId, receiverId uint) (*Message, bool) {
+	msg := Message{SenderId: senderId, ReceiverId: receiverId}
+	if _, ok := msg.Validate(); !ok {
+		return nil, false
+	}
 	lastReceivedMessage := &Message{}
 	lastSendedMessage := &Message{}
 	err1 := GetDB().Table("messages").Where("sender_id = ? and receiver_id = ?", senderId, receiverId).Last(lastSendedMessage).Error
 	err2 := GetDB().Table("messages").Where("sender_id = ? and receiver_id = ?", receiverId, senderId).Last(lastReceivedMessage).Error
 	if err1 == gorm.ErrRecordNotFound && err2 == err1 {
-		return nil
+		return nil, false
 	}
 	if lastReceivedMessage.CreatedAt.Unix() < lastSendedMessage.CreatedAt.Unix() {
-		return lastSendedMessage
+		return lastSendedMessage, true
 	}
-	return lastReceivedMessage
+	return lastReceivedMessage, true
 }
 
-func GetMessages(senderId, receiverId uint) []*Message {
+func GetMessages(senderId, receiverId uint) ([]*Message, bool) {
+	msg := Message{SenderId: senderId, ReceiverId: receiverId}
+	if _, ok := msg.Validate(); !ok {
+		return nil, false
+	}
 	sendedMessages := make([]*Message, 0)
 	receivedMessages := make([]*Message, 0)
 	err1 := GetDB().Table("messages").Where("sender_id = ? and receiver_id = ?", senderId, receiverId).Find(&sendedMessages).Error
 	err2 := GetDB().Table("messages").Where("sender_id = ? and receiver_id = ?", receiverId, senderId).Find(&receivedMessages).Error
 	if err1 == gorm.ErrRecordNotFound && err1 == err2 {
-		return nil
+		return nil, false
 	}
 
 	n := len(sendedMessages) + len(receivedMessages)
@@ -87,5 +104,5 @@ func GetMessages(senderId, receiverId uint) []*Message {
 			p1++
 		}
 	}
-	return messagesBody
+	return messagesBody, true
 }

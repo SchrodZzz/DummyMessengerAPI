@@ -37,11 +37,15 @@ var GetLastMessage = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	message = models.GetLastMessage(userId, message.ReceiverId)
+	message, ok := models.GetLastMessage(userId, message.ReceiverId)
 
-	resp := u.Message(true, "Last message generated")
-	resp["message"] = message
-	u.Response(w, http.StatusOK, resp)
+	if ok {
+		resp := u.Message(true, "Last message generated")
+		resp["message"] = message
+		u.Response(w, http.StatusOK, resp)
+	} else {
+		u.Response(w, http.StatusForbidden, u.Message(false, "Error"))
+	}
 }
 
 var GetMessages = func(w http.ResponseWriter, r *http.Request) {
@@ -53,9 +57,13 @@ var GetMessages = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	messages := models.GetMessages(userId, message.ReceiverId)
+	messages, ok := models.GetMessages(userId, message.ReceiverId)
 
-	resp := u.Message(true, "Last message generated")
-	resp["messages"] = messages
-	u.Response(w, http.StatusOK, resp)
+	if ok {
+		resp := u.Message(true, "Last message generated")
+		resp["messages"] = messages
+		u.Response(w, http.StatusOK, resp)
+	} else {
+		u.Response(w, http.StatusForbidden, u.Message(false, "Error"))
+	}
 }
