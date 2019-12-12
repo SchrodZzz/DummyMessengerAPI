@@ -2,6 +2,7 @@ package models
 
 import (
 	u "DummyMessengerAPI/utils"
+	"fmt"
 	"github.com/jinzhu/gorm"
 )
 
@@ -25,6 +26,16 @@ func (message *Message) Validate() (map[string]interface{}, bool) {
 	if message.SenderId == message.ReceiverId {
 		return u.Message(false, "Attempt to send message to yourself"), false
 	}
+
+	cnt := 0
+	err := GetDB().Table("users").Where("ID = ?").Count(&cnt).Error
+	if err != nil {
+		fmt.Println(err)
+	}
+	if cnt == 0 {
+		return u.Message(false, "Attempt to add nonexistent user"), false
+	}
+
 	return u.Message(true, "Requirement passed"), true
 }
 

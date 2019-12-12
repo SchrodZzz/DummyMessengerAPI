@@ -25,6 +25,16 @@ func (friend *Friend) Validate() (map[string]interface{}, bool) {
 	if AreFriends(friend.OwnId, friend.OwnerId) {
 		return u.Message(false, "Users are already friends"), false
 	}
+
+	cnt := 0
+	err := GetDB().Table("users").Where("ID = ?").Count(&cnt).Error
+	if err != nil {
+		fmt.Println(err)
+	}
+	if cnt == 0 {
+		return u.Message(false, "Attempt to add nonexistent user"), false
+	}
+	
 	return u.Message(true, "Requirement passed"), true
 }
 
