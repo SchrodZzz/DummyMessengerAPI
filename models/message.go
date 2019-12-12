@@ -28,7 +28,7 @@ func (message *Message) Validate() (map[string]interface{}, bool) {
 	}
 
 	cnt := 0
-	err := GetDB().Table("users").Where("ID = ?").Count(&cnt).Error
+	err := GetDB().Table("users").Where("id = ?").Count(&cnt).Error
 	if err != nil {
 		fmt.Println(err)
 	}
