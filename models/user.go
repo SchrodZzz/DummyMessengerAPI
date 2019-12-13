@@ -79,7 +79,7 @@ func Login(login, password string) map[string]interface{} {
 }
 
 func Logout(token string) map[string]interface{} {
-	GetDB().Exec("INSERT INTO tokens_blacklist(token) VALUES(\"" + token + "\")")
+	GetDB().Exec("INSERT INTO tokens_blacklist(token) VALUES('" + token + "')")
 	return u.Message(true, "Logged Out")
 }
 
