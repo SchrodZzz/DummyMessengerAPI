@@ -74,6 +74,7 @@ func Login(login, password string) map[string]interface{} {
 
 	resp := u.Message(true, "Logged In")
 	resp["token"] = tokenString
+	resp["ID"] = user.ID
 	resp["tokenExpDate"] = tokenExpDate
 	return resp
 }
