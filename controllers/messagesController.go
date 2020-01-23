@@ -55,7 +55,7 @@ var GetMessages = func(w http.ResponseWriter, r *http.Request) {
 
 	messages := models.GetMessages(userId, message.ReceiverId)
 
-	resp := u.Message(true, "Last message generated")
+	resp := u.Message(true, "Messages list generated")
 	resp["messages"] = messages
 	u.Response(w, http.StatusOK, resp)
 }
