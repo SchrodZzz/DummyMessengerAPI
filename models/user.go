@@ -57,7 +57,7 @@ func Login(login, password string) map[string]interface{} {
 	err := GetDB().Table("users").Where("login = ?", login).First(user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return u.Message(false, "Login not found")
+			return u.Message(false, "Login not found: " + login)
 		}
 		return u.Message(false, "Connection error. Please retry")
 	}
